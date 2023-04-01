@@ -2,6 +2,9 @@
 
 Word Cloud is a preset for the Moodle activity database.
 
+Word cloud layout by Jason Davies, http://www.jasondavies.com/word-cloud/
+Algorithm due to Jonathan Feinberg, http://static.mrfeinberg.com/bv_ch03.pdf
+
 ## Description
 
 Users can enter text. A word cloud is generated from all submissions.
