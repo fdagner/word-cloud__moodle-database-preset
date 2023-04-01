@@ -8,7 +8,7 @@ Users can enter text. A word cloud is generated from all submissions.
 
 ## Getting started
 
-Download the release file. Create a "Database" activity in Moodle and then upload the ZIP file in the "Presets" tab under "Import".
+Download the [release file](https://github.com/fdagner/word-cloud__moodle-database-preset/releases/tag/publish). Create a "Database" activity in Moodle and then upload the ZIP file in the "Presets" tab under "Import".
 
 ## Language Support
 
