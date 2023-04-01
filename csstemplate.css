@@ -1,0 +1,79 @@
+
+.liste {
+position: relative;
+width: 300px;
+margin: 10px;
+padding: 5px;
+box-shadow: silver 0px 5px 15px;
+border-left: gray solid 12px;
+}
+
+.listerot {
+position: relative;
+width: 300px;
+margin: 10px;
+padding: 5px;
+box-shadow: silver 0px 5px 15px;
+border-left: red solid 12px;
+}
+
+.listegrün {
+position: relative;
+width: 300px;
+margin: 10px;
+padding: 5px;
+box-shadow: silver 0px 5px 15px;
+border-left: green solid 12px;
+}
+
+.listegelb {
+position: relative;
+width: 300px;
+margin: 10px;
+padding: 5px;
+box-shadow: silver 0px 5px 15px;
+border-left: yellow solid 12px;
+}
+
+.listeblau {
+position: relative;
+width: 300px;
+margin: 10px;
+padding: 5px;
+box-shadow: silver 0px 5px 15px;
+border-left: blue solid 12px;
+}
+
+td {
+vertical-align: top;
+}
+
+.symbole {
+text-align: right;
+    vertical-align: bottom;
+    position: absolute;
+margin-top:5px;
+    bottom: 0px;
+    right: 1px;
+width:100%;
+}
+
+#ausgabe {
+display: none;
+}
+#chart {
+background-color:#fff;
+}
+.wort {
+background-color:#fff;padding:0.5em;
+}
+.view {
+font-size:2em;border-radius:1em;
+}
+.view a:link {
+text-decoration: none;
+}
+
+svg {
+width: 99%
+}
