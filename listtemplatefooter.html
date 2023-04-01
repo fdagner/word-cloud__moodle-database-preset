@@ -1,0 +1,524 @@
+</ul></div>
+
+<script>
+function displayentries() {
+document.getElementsByClassName("display")[0].style.display = "inline";
+document.getElementsByClassName("display")[1].style.display = "inline";
+document.getElementsByClassName("dontdisplay")[0].style.display = "none";
+}
+</script>
+
+<script>
+function dontdisplayentries() {
+document.getElementsByClassName("display")[0].style.display = "none";
+document.getElementsByClassName("display")[1].style.display = "none";
+document.getElementsByClassName("dontdisplay")[0].style.display = "inline";
+}
+</script>
+
+<script>
+const einzigartig = (value, index, self) => {
+  return self.indexOf(value) === index
+}
+
+element = document.querySelectorAll(".woerter");
+//console.log(Array.from(element).innerText);
+arr = Array.from(element);
+text =""
+arr.forEach(e => {
+  console.log(e.innerText);
+  text = text + e.innerText;
+});
+liste = text.split(";").sort();
+console.log(liste);
+aus = document.querySelector("#ausgabe");
+ausgabeliste=liste.join(",").replace(/\s+/g, " ");
+console.log(ausgabeliste)
+wortliste = liste.filter(einzigartig).join(",").replace(/\s+/g, " ");
+console.log(wortliste);
+aus.innerHTML=wortliste;
+console.log(wortliste);
+
+</script>
+
+<script>
+// Word cloud layout by Jason Davies, http://www.jasondavies.com/word-cloud/
+// Algorithm due to Jonathan Feinberg, http://static.mrfeinberg.com/bv_ch03.pdf
+(function() {
+  function cloud() {
+    var size = [256, 256],
+        text = cloudText,
+        font = cloudFont,
+        fontSize = cloudFontSize,
+        fontStyle = cloudFontNormal,
+        fontWeight = cloudFontNormal,
+        rotate = cloudRotate,
+        padding = cloudPadding,
+        spiral = archimedeanSpiral,
+        words = [],
+        timeInterval = Infinity,
+        event = d3.dispatch("word", "end"),
+        timer = null,
+        cloud = {};
+
+    cloud.start = function() {
+      var board = zeroArray((size[0] >> 5) * size[1]),
+          bounds = null,
+          n = words.length,
+          i = -1,
+          tags = [],
+          data = words.map(function(d, i) {
+            d.text = text.call(this, d, i);
+            d.font = font.call(this, d, i);
+            d.style = fontStyle.call(this, d, i);
+            d.weight = fontWeight.call(this, d, i);
+            d.rotate = rotate.call(this, d, i);
+            d.size = ~~fontSize.call(this, d, i);
+            d.padding = padding.call(this, d, i);
+            return d;
+          }).sort(function(a, b) { return b.size - a.size; });
+
+      if (timer) clearInterval(timer);
+      timer = setInterval(step, 0);
+      step();
+
+      return cloud;
+
+      function step() {
+        var start = +new Date,
+            d;
+        while (+new Date - start < timeInterval && ++i < n && timer) {
+          d = data[i];
+          d.x = (size[0] * (Math.random() + .5)) >> 1;
+          d.y = (size[1] * (Math.random() + .5)) >> 1;
+          cloudSprite(d, data, i);
+          if (d.hasText && place(board, d, bounds)) {
+            tags.push(d);
+            event.word(d);
+            if (bounds) cloudBounds(bounds, d);
+            else bounds = [{x: d.x + d.x0, y: d.y + d.y0}, {x: d.x + d.x1, y: d.y + d.y1}];
+            // Temporary hack
+            d.x -= size[0] >> 1;
+            d.y -= size[1] >> 1;
+          }
+        }
+        if (i >= n) {
+          cloud.stop();
+          event.end(tags, bounds);
+        }
+      }
+    }
+
+    cloud.stop = function() {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+      return cloud;
+    };
+
+    cloud.timeInterval = function(x) {
+      if (!arguments.length) return timeInterval;
+      timeInterval = x == null ? Infinity : x;
+      return cloud;
+    };
+
+    function place(board, tag, bounds) {
+      var perimeter = [{x: 0, y: 0}, {x: size[0], y: size[1]}],
+          startX = tag.x,
+          startY = tag.y,
+          maxDelta = Math.sqrt(size[0] * size[0] + size[1] * size[1]),
+          s = spiral(size),
+          dt = Math.random() < .5 ? 1 : -1,
+          t = -dt,
+          dxdy,
+          dx,
+          dy;
+
+      while (dxdy = s(t += dt)) {
+        dx = ~~dxdy[0];
+        dy = ~~dxdy[1];
+
+        if (Math.min(dx, dy) > maxDelta) break;
+
+        tag.x = startX + dx;
+        tag.y = startY + dy;
+
+        if (tag.x + tag.x0 < 0 || tag.y + tag.y0 < 0 ||
+            tag.x + tag.x1 > size[0] || tag.y + tag.y1 > size[1]) continue;
+        // TODO only check for collisions within current bounds.
+        if (!bounds || !cloudCollide(tag, board, size[0])) {
+          if (!bounds || collideRects(tag, bounds)) {
+            var sprite = tag.sprite,
+                w = tag.width >> 5,
+                sw = size[0] >> 5,
+                lx = tag.x - (w << 4),
+                sx = lx & 0x7f,
+                msx = 32 - sx,
+                h = tag.y1 - tag.y0,
+                x = (tag.y + tag.y0) * sw + (lx >> 5),
+                last;
+            for (var j = 0; j < h; j++) {
+              last = 0;
+              for (var i = 0; i <= w; i++) {
+                board[x + i] |= (last << msx) | (i < w ? (last = sprite[j * w + i]) >>> sx : 0);
+              }
+              x += sw;
+            }
+            delete tag.sprite;
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    cloud.words = function(x) {
+      if (!arguments.length) return words;
+      words = x;
+      return cloud;
+    };
+
+    cloud.size = function(x) {
+      if (!arguments.length) return size;
+      size = [+x[0], +x[1]];
+      return cloud;
+    };
+
+    cloud.font = function(x) {
+      if (!arguments.length) return font;
+      font = d3.functor(x);
+      return cloud;
+    };
+
+    cloud.fontStyle = function(x) {
+      if (!arguments.length) return fontStyle;
+      fontStyle = d3.functor(x);
+      return cloud;
+    };
+
+    cloud.fontWeight = function(x) {
+      if (!arguments.length) return fontWeight;
+      fontWeight = d3.functor(x);
+      return cloud;
+    };
+
+    cloud.rotate = function(x) {
+      if (!arguments.length) return rotate;
+      rotate = d3.functor(x);
+      return cloud;
+    };
+
+    cloud.text = function(x) {
+      if (!arguments.length) return text;
+      text = d3.functor(x);
+      return cloud;
+    };
+
+    cloud.spiral = function(x) {
+      if (!arguments.length) return spiral;
+      spiral = spirals[x + ""] || x;
+      return cloud;
+    };
+
+    cloud.fontSize = function(x) {
+      if (!arguments.length) return fontSize;
+      fontSize = d3.functor(x);
+      return cloud;
+    };
+
+    cloud.padding = function(x) {
+      if (!arguments.length) return padding;
+      padding = d3.functor(x);
+      return cloud;
+    };
+
+    return d3.rebind(cloud, event, "on");
+  }
+
+  function cloudText(d) {
+    return d.text;
+  }
+
+  function cloudFont() {
+    return "serif";
+  }
+
+  function cloudFontNormal() {
+    return "normal";
+  }
+
+  function cloudFontSize(d) {
+    return Math.sqrt(d.value);
+  }
+
+  function cloudRotate() {
+    return (~~(Math.random() * 6) - 3) * 30;
+  }
+
+  function cloudPadding() {
+    return 1;
+  }
+
+  // Fetches a monochrome sprite bitmap for the specified text.
+  // Load in batches for speed.
+  function cloudSprite(d, data, di) {
+    if (d.sprite) return;
+    c.clearRect(0, 0, (cw << 5) / ratio, ch / ratio);
+    var x = 0,
+        y = 0,
+        maxh = 0,
+        n = data.length;
+    --di;
+    while (++di < n) {
+      d = data[di];
+      c.save();
+      c.font = d.style + " " + d.weight + " " + ~~((d.size + 1) / ratio) + "px " + d.font;
+      var w = c.measureText(d.text + "m").width * ratio,
+          h = d.size << 1;
+      if (d.rotate) {
+        var sr = Math.sin(d.rotate * cloudRadians),
+            cr = Math.cos(d.rotate * cloudRadians),
+            wcr = w * cr,
+            wsr = w * sr,
+            hcr = h * cr,
+            hsr = h * sr;
+        w = (Math.max(Math.abs(wcr + hsr), Math.abs(wcr - hsr)) + 0x1f) >> 5 << 5;
+        h = ~~Math.max(Math.abs(wsr + hcr), Math.abs(wsr - hcr));
+      } else {
+        w = (w + 0x1f) >> 5 << 5;
+      }
+      if (h > maxh) maxh = h;
+      if (x + w >= (cw << 5)) {
+        x = 0;
+        y += maxh;
+        maxh = 0;
+      }
+      if (y + h >= ch) break;
+      c.translate((x + (w >> 1)) / ratio, (y + (h >> 1)) / ratio);
+      if (d.rotate) c.rotate(d.rotate * cloudRadians);
+      c.fillText(d.text, 0, 0);
+      if (d.padding) c.lineWidth = 2 * d.padding, c.strokeText(d.text, 0, 0);
+      c.restore();
+      d.width = w;
+      d.height = h;
+      d.xoff = x;
+      d.yoff = y;
+      d.x1 = w >> 1;
+      d.y1 = h >> 1;
+      d.x0 = -d.x1;
+      d.y0 = -d.y1;
+      d.hasText = true;
+      x += w;
+    }
+    var pixels = c.getImageData(0, 0, (cw << 5) / ratio, ch / ratio).data,
+        sprite = [];
+    while (--di >= 0) {
+      d = data[di];
+      if (!d.hasText) continue;
+      var w = d.width,
+          w32 = w >> 5,
+          h = d.y1 - d.y0;
+      // Zero the buffer
+      for (var i = 0; i < h * w32; i++) sprite[i] = 0;
+      x = d.xoff;
+      if (x == null) return;
+      y = d.yoff;
+      var seen = 0,
+          seenRow = -1;
+      for (var j = 0; j < h; j++) {
+        for (var i = 0; i < w; i++) {
+          var k = w32 * j + (i >> 5),
+              m = pixels[((y + j) * (cw << 5) + (x + i)) << 2] ? 1 << (31 - (i % 32)) : 0;
+          sprite[k] |= m;
+          seen |= m;
+        }
+        if (seen) seenRow = j;
+        else {
+          d.y0++;
+          h--;
+          j--;
+          y++;
+        }
+      }
+      d.y1 = d.y0 + seenRow;
+      d.sprite = sprite.slice(0, (d.y1 - d.y0) * w32);
+    }
+  }
+
+  // Use mask-based collision detection.
+  function cloudCollide(tag, board, sw) {
+    sw >>= 5;
+    var sprite = tag.sprite,
+        w = tag.width >> 5,
+        lx = tag.x - (w << 4),
+        sx = lx & 0x7f,
+        msx = 32 - sx,
+        h = tag.y1 - tag.y0,
+        x = (tag.y + tag.y0) * sw + (lx >> 5),
+        last;
+    for (var j = 0; j < h; j++) {
+      last = 0;
+      for (var i = 0; i <= w; i++) {
+        if (((last << msx) | (i < w ? (last = sprite[j * w + i]) >>> sx : 0))
+            & board[x + i]) return true;
+      }
+      x += sw;
+    }
+    return false;
+  }
+
+  function cloudBounds(bounds, d) {
+    var b0 = bounds[0],
+        b1 = bounds[1];
+    if (d.x + d.x0 < b0.x) b0.x = d.x + d.x0;
+    if (d.y + d.y0 < b0.y) b0.y = d.y + d.y0;
+    if (d.x + d.x1 > b1.x) b1.x = d.x + d.x1;
+    if (d.y + d.y1 > b1.y) b1.y = d.y + d.y1;
+  }
+
+  function collideRects(a, b) {
+    return a.x + a.x1 > b[0].x && a.x + a.x0 < b[1].x && a.y + a.y1 > b[0].y && a.y + a.y0 < b[1].y;
+  }
+
+  function archimedeanSpiral(size) {
+    var e = size[0] / size[1];
+    return function(t) {
+      return [e * (t *= .1) * Math.cos(t), t * Math.sin(t)];
+    };
+  }
+
+  function rectangularSpiral(size) {
+    var dy = 4,
+        dx = dy * size[0] / size[1],
+        x = 0,
+        y = 0;
+    return function(t) {
+      var sign = t < 0 ? -1 : 1;
+      // See triangular numbers: T_n = n * (n + 1) / 2.
+      switch ((Math.sqrt(1 + 4 * sign * t) - sign) & 3) {
+        case 0:  x += dx; break;
+        case 1:  y += dy; break;
+        case 2:  x -= dx; break;
+        default: y -= dy; break;
+      }
+      return [x, y];
+    };
+  }
+
+  // TODO reuse arrays?
+  function zeroArray(n) {
+    var a = [],
+        i = -1;
+    while (++i < n) a[i] = 0;
+    return a;
+  }
+
+  var cloudRadians = Math.PI / 180,
+      cw = 1 << 11 >> 5,
+      ch = 1 << 11,
+      canvas,
+      ratio = 1;
+
+  if (typeof document !== "undefined") {
+    canvas = document.createElement("canvas");
+    canvas.width = 1;
+    canvas.height = 1;
+    ratio = Math.sqrt(canvas.getContext("2d").getImageData(0, 0, 1, 1).data.length >> 2);
+    canvas.width = (cw << 5) / ratio;
+    canvas.height = ch / ratio;
+  } else {
+    // Attempt to use node-canvas.
+    canvas = new Canvas(cw << 5, ch);
+  }
+
+  var c = canvas.getContext("2d"),
+      spirals = {
+        archimedean: archimedeanSpiral,
+        rectangular: rectangularSpiral
+      };
+  c.fillStyle = c.strokeStyle = "red";
+  c.textAlign = "center";
+
+  if (typeof module === "object" && module.exports) module.exports = cloud;
+  else (d3.layout || (d3.layout = {})).cloud = cloud;
+})();
+</script>
+<script>
+drawWordCloud(ausgabeliste);
+      function drawWordCloud(text_string){
+        //var common = "poop,i,me,my,myself,we,us,our,ours,ourselves,you,your,yours,yourself,yourselves,he,him,his,himself,she,her,hers,herself,it,its,itself,they,them,their,theirs,themselves,what,which,who,whom,whose,this,that,these,those,am,is,are,was,were,be,been,being,have,has,had,having,do,does,did,doing,will,would,should,can,could,ought,i'm,you're,he's,she's,it's,we're,they're,i've,you've,we've,they've,i'd,you'd,he'd,she'd,we'd,they'd,i'll,you'll,he'll,she'll,we'll,they'll,isn't,aren't,wasn't,weren't,hasn't,haven't,hadn't,doesn't,don't,didn't,won't,wouldn't,shan't,shouldn't,can't,cannot,couldn't,mustn't,let's,that's,who's,what's,here's,there's,when's,where's,why's,how's,a,an,the,and,but,if,or,because,as,until,while,of,at,by,for,with,about,against,between,into,through,during,before,after,above,below,to,from,up,upon,down,in,out,on,off,over,under,again,further,then,once,here,there,when,where,why,how,all,any,both,each,few,more,most,other,some,such,no,nor,not,only,own,same,so,than,too,very,say,says,said,shall";
+        var common = "ab,aber,abgesehen,alle,allein,aller,alles,als,am,an,andere,anderen,anderenfalls,anderer,anderes,anstatt,auch,auf,aus,aussen,außen,ausser,außer,ausserdem,außerdem,außerhalb,ausserhalb,behalten,bei,beide,beiden,beider,beides,beinahe,bevor,bin,bis,bist,bitte,da,daher,danach,dann,darueber,darüber,darueberhinaus,darüberhinaus,darum,das,dass,daß,dem,den,der,des,deshalb,die,diese,diesem,diesen,dieser,dieses,dort,duerfte,duerften,duerftest,duerftet,dürfte,dürften,dürftest,dürftet,durch,durfte,durften,durftest,durftet,ein,eine,einem,einen,einer,eines,einige,einiger,einiges,entgegen,entweder,erscheinen,es,etwas,fast,fertig,fort,fuer,für,gegen,gegenueber,gegenüber,gehalten,geht,gemacht,gemaess,gemäß,genug,getan,getrennt,gewesen,gruendlich,gründlich,habe,haben,habt,haeufig,häufig,hast,hat,hatte,hatten,hattest,hattet,hier,hindurch,hintendran,hinter,hinunter,ich,ihm,ihnen,ihr,ihre,ihrem,ihren,ihrer,ihres,ihrige,ihrigen,ihriges,immer,in,indem,innerhalb,innerlich,irgendetwas,irgendwelche,irgendwenn,irgendwo,irgendwohin,ist,jede,jedem,jeden,jeder,jedes,jedoch,jemals,jemand,jemandem,jemanden,jemandes,jene,jung,junge,jungem,jungen,junger,junges,kann,kannst,kaum,koennen,koennt,koennte,koennten,koenntest,koenntet,können,könnt,könnte,könnten,könntest,könntet,konnte,konnten,konntest,konntet,machen,macht,machte,mehr,mehrere,mein,meine,meinem,meinen,meiner,meines,meistens,mich,mir,mit,muessen,müssen,muesst,müßt,muß,muss,musst,mußt,nach,nachdem,naechste,nächste,nebenan,nein,nichts,niemand,niemandem,niemanden,niemandes,nirgendwo,nur,oben,obwohl,oder,oft,ohne,pro,sagte,sagten,sagtest,sagtet,scheinen,sehr,sei,seid,seien,seiest,seiet,sein,seine,seinem,seinen,seiner,seines,seit,selbst,sich,sie,sind,so,sogar,solche,solchem,solchen,solcher,solches,sollte,sollten,solltest,solltet,sondern,statt,stets,tatsächlich,tatsaechlich,tief,tun,tut,ueber,über,ueberall,überll,um,und,uns,unser,unsere,unserem,unseren,unserer,unseres,unten,unter,unterhalb,usw,viel,viele,vielleicht,von,vor,vorbei,vorher,vorueber,vorüber,waehrend,während,wann,war,waren,warst,wart,was,weder,wegen,weil,weit,weiter,weitere,weiterem,weiteren,weiterer,weiteres,welche,welchem,welchen,welcher,welches,wem,wen,wenige,wenn,wer,werde,werden,werdet,wessen,wie,wieder,wir,wird,wirklich,wirst,wo,wohin,wuerde,wuerden,wuerdest,wuerdet,würde,würden,würdest,würdet,wurde,wurden,wurdest,wurdet,ziemlich,zu,zum,zur,zusammen,zwischen,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,348,349,350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365,366,367,368,369,370,371,372,373,374,375,376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,419,420,421,422,423,424,425,426,427,428,429,430,431,432,433,434,435,436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451,452,453,454,455,456,457,458,459,460,461,462,463,464,465,466,467,468,469,470,471,472,473"
+            
+        var word_count = {};
+
+        var words = text_string.split(",");
+          if (words.length == 1){
+            word_count[words[0]] = 1;
+          } else {
+            words.forEach(function(word){
+              var word = word.toUpperCase();
+              if (word != "" && common.indexOf(word)==-1 && word.length>1){
+                if (word_count[word]){
+                  word_count[word]++;
+                } else {
+                  word_count[word] = 1;
+                }
+              }
+            })
+          }
+console.log(words);
+        var svg_location = "#chart";
+        // var width = window.innerWidth*0.8;
+        //var width = $(document).width()*0.8;
+        var height=600;
+       var width=1500;
+         //var height = window.innerHeight/2;
+        //var height = $(document).height()/2;
+        var fill = d3.scale.category20();
+        var word_entries = d3.entries(word_count);
+        var xScale = d3.scale.linear()
+           .domain([0, d3.max(word_entries, function(d) {
+              return d.value;
+            })
+           ])
+           .range([10,100]);
+
+        d3.layout.cloud().size([width, height])
+          .timeInterval(20)
+          .words(word_entries)
+          .fontSize(function(d) { return xScale(+d.value); })
+          .text(function(d) { return d.key; })
+          .rotate(function() { return ~~(Math.random() * 2) * 0; })
+          .font("Impact")
+          .on("end", draw)
+          .start();
+
+        function draw(words) {
+          d3.select(svg_location).append("svg")
+             .attr("height", height)
+              .attr("width", "95%")
+             .style("max-width", "1600px")
+             // .style("width", "75%")
+             .attr("viewBox", `0 0 1500 600`)
+            .append("g")
+              .attr("transform", "translate(" + [width >> 1, height >> 1] + ")")
+            .selectAll("text")
+              .data(words)
+            .enter().append("text")
+              .style("font-size", function(d) { return xScale(d.value) + "px"; })
+              .style("font-family", "Impact")
+              .style("fill", function(d, i) { return fill(i); })
+              .attr("text-anchor", "middle")
+              .attr("transform", function(d) {
+                return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+              })
+              .text(function(d) { return d.key; });
+        }
+
+        d3.layout.cloud().stop();
+      }
+</script>
+</section>
+
+
