@@ -27,17 +27,13 @@ arr = Array.from(element);
 text =""
 arr.forEach(e => {
   console.log(e.innerText);
-  text = text + e.innerText;
+  text = text + e.innerText+",";
 });
-liste = text.split(";").sort();
-console.log(liste);
+liste = text.split(/[ '\-\(\)\*":;\[\]|{},.!?]+/).sort();
 aus = document.querySelector("#ausgabe");
-ausgabeliste=liste.join(",").replace(/\s+/g, " ");
-console.log(ausgabeliste)
-wortliste = liste.filter(einzigartig).join(",").replace(/\s+/g, " ");
-console.log(wortliste);
+ausgabeliste=liste.join(" ").replace(/\s+/g, " ");
+wortliste = liste.filter(einzigartig).join(" ").replace(/\s+/g, " ");
 aus.innerHTML=wortliste;
-console.log(wortliste);
 
 </script>
 
@@ -452,7 +448,7 @@ drawWordCloud(ausgabeliste);
             
         var word_count = {};
 
-        var words = text_string.split(",");
+        var words = text_string.split(/[ '\-\(\)\*":;\[\]|{},.!?]+/);
           if (words.length == 1){
             word_count[words[0]] = 1;
           } else {
@@ -467,13 +463,12 @@ drawWordCloud(ausgabeliste);
               }
             })
           }
-console.log(words);
+
         var svg_location = "#chart";
-        // var width = window.innerWidth*0.8;
+        var width = window.innerWidth*0.8;
         //var width = $(document).width()*0.8;
-        var height=600;
-       var width=1500;
-         //var height = window.innerHeight/2;
+       var height=600;
+       //var height = window.innerHeight/2;
         //var height = $(document).height()/2;
         var fill = d3.scale.category20();
         var word_entries = d3.entries(word_count);
@@ -496,11 +491,8 @@ console.log(words);
 
         function draw(words) {
           d3.select(svg_location).append("svg")
-             .attr("height", height)
-              .attr("width", "95%")
-             .style("max-width", "1600px")
-             // .style("width", "75%")
-             .attr("viewBox", `0 0 1500 600`)
+              .attr("width", width)
+              .attr("height", height)
             .append("g")
               .attr("transform", "translate(" + [width >> 1, height >> 1] + ")")
             .selectAll("text")
