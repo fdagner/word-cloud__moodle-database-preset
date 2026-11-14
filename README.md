@@ -2,12 +2,32 @@
 
 Word Cloud is a preset for the Moodle activity database.
 
-Word cloud layout by Jason Davies, http://www.jasondavies.com/word-cloud/,
-Algorithm due to Jonathan Feinberg, http://static.mrfeinberg.com/bv_ch03.pdf
-
 ## Description
 
-Users can enter text. A word cloud is generated from all submissions.
+Users enter words into three text fields. A word cloud is generated from all
+submissions and displayed on the list view.
+
+The cloud is rendered as SVG with a small custom script – no external
+libraries (no D3, no CDN), works offline.
+
+Features:
+
+- Biggest word in the vertical centre, sizes decreasing towards the edges
+  (pyramid layout)
+- Fixed colour palette, no rotation
+- Case-insensitive counting; words with a single occurrence are included
+- Responsive: the cloud scales down on small screens
+- Auto reload option: fetches the page in the background every 15 s without a
+  full page reload (no flicker, scroll position preserved)
+- Action menus (`##actionsmenu##`) in the entry cards and single view
+- Download button: save the cloud as an SVG file
+- Entry list as a responsive card grid
+- Styled add-entry form with a hint about the semicolon format
+
+## Requirements
+
+- Moodle 4.1 or newer (the templates use the `##actionsmenu##` tag,
+  MDL-75275)
 
 ## Getting started
 

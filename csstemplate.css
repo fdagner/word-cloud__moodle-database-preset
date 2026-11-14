@@ -1,79 +1,157 @@
+/* ============================================================
+ * Word cloud – Moodle database preset styles
+ * Works with Moodle 4 (Bootstrap 4) and Moodle 5 (Bootstrap 5).
+ * ============================================================ */
 
-.liste {
-position: relative;
-width: 300px;
-margin: 10px;
-padding: 5px;
-box-shadow: silver 0px 5px 15px;
-border-left: gray solid 12px;
-}
-
-.listerot {
-position: relative;
-width: 300px;
-margin: 10px;
-padding: 5px;
-box-shadow: silver 0px 5px 15px;
-border-left: red solid 12px;
+/* --- List view: word cloud --- */
+#wordcloud-chart {
+  background-color: #fff;
 }
 
-.listegrün {
-position: relative;
-width: 300px;
-margin: 10px;
-padding: 5px;
-box-shadow: silver 0px 5px 15px;
-border-left: green solid 12px;
+/* SVG at 95% width; the viewBox scales it down on small screens */
+#wordcloud-chart svg {
+  width: 95%;
+  max-width: 1000px;
+  height: auto;
+  display: block;
 }
 
-.listegelb {
-position: relative;
-width: 300px;
-margin: 10px;
-padding: 5px;
-box-shadow: silver 0px 5px 15px;
-border-left: yellow solid 12px;
+/* --- Entry cards (toggled with "Einträge anzeigen") --- */
+#wordcloud-entries-panel ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  /* Responsive: 1 column on phones, more columns on wider screens */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
 }
 
-.listeblau {
-position: relative;
-width: 300px;
-margin: 10px;
-padding: 5px;
-box-shadow: silver 0px 5px 15px;
-border-left: blue solid 12px;
+.wordcloud-entry-card {
+  position: relative;
+  background-color: #fff;
+  padding: 0.75em 2.6em 0.75em 0.75em;
+  border-radius: 6px;
+  box-shadow: silver 0px 2px 8px;
+  border-left: gray solid 8px;
+  word-break: break-word;
 }
 
-td {
-vertical-align: top;
+/* One labelled row per field (Text 1/2/3) inside an entry card */
+.wordcloud-entry-field {
+  margin-top: 0.25em;
 }
 
-.symbole {
-text-align: right;
-    vertical-align: bottom;
-    position: absolute;
-margin-top:5px;
-    bottom: 0px;
-    right: 1px;
-width:100%;
+.wordcloud-field-label {
+  font-weight: 600;
+  color: #6c757d;
+  margin-right: 0.4em;
 }
 
-#ausgabe {
-display: none;
-}
-#chart {
-background-color:#fff;
-}
-.wort {
-background-color:#fff;padding:0.5em;
-}
-.view {
-font-size:2em;border-radius:1em;
-}
-.view a:link {
-text-decoration: none;
+/* Action menu per card: ##actionsmenu## renders Moodle's native dropdown
+ * (available since Moodle 4.1). The wrapper only positions it in the card. */
+.wordcloud-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
 }
 
-svg {
-width: 99%
+/* --- Button row: download button + entries toggle --- */
+.wordcloud-buttons .btn {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 2px 6px 2px 0;
+}
+
+/* --- Single view --- */
+.wordcloud-single {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1.25em;
+    background-color: #fff;
+    border-radius: 6px;
+    box-shadow: silver 0px 2px 8px;
+    border-left: gray solid 8px;
+}
+
+.wordcloud-single-head {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-bottom: 1em;
+    /* leave room for the action menu button on the right */
+    padding-right: 2.6em;
+}
+
+.wordcloud-single-user {
+    font-weight: 600;
+}
+
+.wordcloud-single-field {
+    margin-bottom: 0.75em;
+    word-break: break-word;
+}
+
+.wordcloud-single-field:last-child {
+    margin-bottom: 0;
+}
+
+.wordcloud-single-label {
+    font-weight: 600;
+    color: #6c757d;
+    margin-right: 0.5em;
+}
+
+/* --- Add entry form --- */
+.wordcloud-form {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.25em;
+  background-color: #fff;
+  border-radius: 6px;
+  box-shadow: silver 0px 2px 8px;
+  border-left: gray solid 8px;
+}
+
+.wordcloud-form-hint {
+  font-size: 0.9em;
+  color: #6c757d;
+  margin: 0 0 1em 0;
+}
+
+.wordcloud-form-field {
+  margin-bottom: 1.25em;
+}
+
+.wordcloud-form-last {
+  margin-bottom: 0;
+}
+
+.wordcloud-form-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.3em;
+}
+
+.wordcloud-form input[type="text"],
+.wordcloud-form textarea {
+  width: 100%;
+}
+
+/* --- Misc --- */
+
+/* Hidden helper element that lists all unique words */
+#wordcloud-output {
+  display: none;
+}
+/* Field tables of the single/search templates */
+.defaulttemplate td {
+  vertical-align: top;
+}
+
+/* Right aligned text, independent of Bootstrap 4 (text-right)
+   and Bootstrap 5 (text-end) */
+.wordcloud-right {
+  text-align: right;
 }
