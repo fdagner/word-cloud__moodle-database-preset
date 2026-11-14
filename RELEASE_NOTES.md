@@ -1,37 +1,37 @@
 # Release Notes – Word Cloud Preset 2.0
 
-## Neu
+## New
 
-- Komplette Neuentwicklung der Wortwolke ohne externe Bibliotheken
-  (kein D3.js, kein CDN – ~350 Zeilen Vanilla-JS, funktioniert offline)
-- Pyramiden-Layout: das größte Wort steht mittig, nach außen wird es kleiner
-- Feste Farbpalette, keine Wortdrehung
-- Case-insensitive Zählung – Wörter mit nur 1 Vorkommen werden einbezogen
-- Responsiv: die Wolke skaliert auf Mobilgeräten kleiner
-- Download-Button: Wolke als SVG-Datei speichern
-- Optionale automatische Aktualisierung ohne Neuladen der Seite
-  (15 s, kein Flackern, Scrollposition bleibt erhalten)
+- Complete rewrite of the word cloud without external libraries
+  (no D3.js, no CDN – ~350 lines of vanilla JS, works offline)
+- Pyramid layout: the biggest word is centred, sizes decrease outwards
+- Fixed colour palette, no word rotation
+- Case-insensitive counting – words with a single occurrence are included
+- Responsive: the cloud scales down on small screens
+- Download button: save the cloud as an SVG file
+- Optional auto refresh without reloading the page
+  (every 15 s, no flicker, scroll position preserved)
 
-## Verbessert
+## Improved
 
-- Eintragskarten als responsives Grid mit beschrifteten Feldern (Text 1–3)
-- Aktionsmenü (`##actionsmenu##`) in Listen- und Einzelansicht
-- Einzelansicht als aufgeräumte Karte
-- Aufgefrischtes Hinzufügen-Formular mit Hinweis zum Semikolon-Format
-- Alle CSS-Klassen und IDs mit `wordcloud-`-Präfix (keine Theme-Konflikte)
+- Entry cards as a responsive grid with labelled fields (Text 1–3)
+- Action menus (`##actionsmenu##`) in the list view and single view
+- Single view as a clean card
+- Refreshed add-entry form with a hint about the semicolon format
+- All CSS classes and ids prefixed with `wordcloud-` (no theme conflicts)
 
-## Behobene Fehler
+## Fixed
 
-- Stopwort-Filter arbeitete nie (Groß-/Kleinschreibungsfehler)
-- `ß` wurde durch toUpperCase() zu „SS" („Straße" → „STRASSE")
-- Doppelte Word-Cloud-Implementierung (~400 Zeilen Duplikat) entfernt
-- Ungültiges HTML im Listen- und RSS-Template
+- Stop-word filter never worked (case sensitivity bug)
+- `ß` was turned into „SS" by toUpperCase() ("Straße" → "STRASSE")
+- Removed the duplicated word cloud implementation (~400 line duplicate)
+- Invalid HTML in the list and RSS templates
 
-## Voraussetzung
+## Requirements
 
-- Moodle 4.1 oder neuer (das Templates nutzen `##actionsmenu##`, MDL-75275)
+- Moodle 4.1 or newer (the templates use `##actionsmenu##`, MDL-75275)
 
 ## Upgrade
 
-Bestehende Datenbanken: Preset-ZIP importieren (die Templates werden
-übersetzt, die Daten bleiben unverändert). Danach einmal Strg+F5.
+Existing databases: import the preset ZIP (the templates are replaced, the
+data stays untouched). Then press Ctrl+F5 once.
