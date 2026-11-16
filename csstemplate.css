@@ -37,9 +37,14 @@
   word-break: break-word;
 }
 
-/* One labelled row per field (Text 1/2/3) inside an entry card */
+/* One labelled row per letter (A-Z) inside an entry card */
 .wordcloud-entry-field {
   margin-top: 0.25em;
+}
+
+/* Hide letter rows without content (list view) */
+.wordcloud-entry-field:has(.wordcloud-words:empty) {
+  display: none;
 }
 
 .wordcloud-field-label {
@@ -93,6 +98,16 @@
     word-break: break-word;
 }
 
+/* Hide letter rows without content (single view) */
+.wordcloud-single-field:has(.wordcloud-single-value:empty) {
+    display: none;
+}
+
+/* Show only the letters that have content, in a compact row layout */
+.wordcloud-single-value {
+    margin-right: 0.25em;
+}
+
 .wordcloud-single-field:last-child {
     margin-bottom: 0;
 }
@@ -120,11 +135,15 @@
   margin: 0 0 1em 0;
 }
 
-.wordcloud-form-field {
-  margin-bottom: 1.25em;
+.wordcloud-form-grid {
+  display: grid;
+  /* Responsive alphabet grid: compact on phones, up to 6 columns on
+     wide screens */
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.75em;
 }
 
-.wordcloud-form-last {
+.wordcloud-form-field {
   margin-bottom: 0;
 }
 

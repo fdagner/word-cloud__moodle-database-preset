@@ -4,8 +4,10 @@ Word Cloud is a preset for the Moodle activity database.
 
 ## Description
 
-Users enter words into three text fields. A word cloud is generated from all
-submissions and displayed on the list view.
+Users enter words into 26 text fields, one for each initial letter (A–Z).
+Within a field, multiple terms are separated by comma or semicolon
+(e.g. "Baum, Haus; Garten"). A word cloud is generated from all submissions
+and displayed on the list view.
 
 The cloud is rendered as SVG with a small custom script – no external
 libraries (no D3, no CDN), works offline.
@@ -22,7 +24,8 @@ Features:
 - Action menus (`##actionsmenu##`) in the entry cards and single view
 - Download button: save the cloud as an SVG file
 - Entry list as a responsive card grid
-- Styled add-entry form with a hint about the semicolon format
+- Styled add-entry form with an A–Z alphabet grid and a hint about the
+  comma/semicolon format
 
 ## Requirements
 

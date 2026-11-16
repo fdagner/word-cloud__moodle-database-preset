@@ -5,7 +5,8 @@
  * Works with Moodle 4 and Moodle 5.
  *
  * Flow:
- *   1. Collect the words of all entries (span.wordcloud-words, separated by ";")
+ *   1. Collect the words of all entries (span.wordcloud-words, separated
+ *      by "," or ";")
  *   2. Count frequencies (case-insensitive, deliberately without stop-word
  *      filtering: filler words such as "die" or "und" stay in the cloud so
  *      they can be analysed in German lessons)
@@ -52,7 +53,7 @@
      * --------------------------------------------------------------- */
 
     /**
-     * Counts the words of a text (tokens separated by ";").
+     * Counts the words of a text (tokens separated by "," or ";").
      * Counting is case-insensitive ("Haus" and "haus" add up), but the word
      * is displayed in the spelling of its first occurrence so that umlauts
      * and "ß" are not corrupted by toUpperCase() ("Straße" -> "STRASSE").
@@ -67,7 +68,7 @@
         }
         var counts = {};
         var order = [];
-        text.split(';').forEach(function (raw) {
+        text.split(/[,;]/).forEach(function (raw) {
             var word = raw.trim();
             var key = word.toUpperCase();
             if (key.length >= MIN_WORD_LENGTH) {
@@ -394,7 +395,7 @@
     function fillWordList(text) {
         var seen = {};
         var unique = [];
-        text.split(';').forEach(function (raw) {
+        text.split(/[,;]/).forEach(function (raw) {
             var word = raw.trim();
             var key = word.toUpperCase();
             if (word && !seen[key]) {
