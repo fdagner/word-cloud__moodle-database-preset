@@ -136,15 +136,13 @@
 }
 
 .wordcloud-form-grid {
-  display: grid;
-  /* Responsive alphabet grid: compact on phones, up to 6 columns on
-     wide screens */
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 0.75em;
+  /* Single column: every letter field stacked below the previous one,
+     so each input gets the full width */
+  display: block;
 }
 
 .wordcloud-form-field {
-  margin-bottom: 0;
+  margin-bottom: 1em;
 }
 
 .wordcloud-form-label {
